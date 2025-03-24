@@ -1,0 +1,8 @@
+joblib
+spacy
+nltk
+numpy
+pandas
+scikit-learn
+selenium
+matplotlib
