@@ -1,40 +1,40 @@
 # NLP Enriched News
 
 ## Description
-Ce projet exécute un pipeline NLP sur 300 articles de presse pour enrichir les données avec des informations sur les entités nommées, les sujets abordés, l'analyse de sentiment et la détection de scandales environnementaux. Les résultats sont sauvegardés dans un fichier CSV `results/enhanced_news.csv`.
+This project runs an NLP pipeline on 300 news articles to enrich the data with information about named entities, covered topics, sentiment analysis, and detection of environmental scandals. The results are saved in a CSV file `results/enhanced_news.csv`.
 
-## Structure des données générées
+## Generated Data Structure
 
-Chaque article traité est enregistré avec les informations suivantes :
+Each processed article is recorded with the following information:
 
-| Champ               | Type          | Description |
+| Field               | Type          | Description |
 |--------------------|--------------|-------------|
-| `uuid`            | `int` ou `str` | Identifiant unique de l'article |
-| `url`             | `str` | URL de l'article |
-| `date_scraped`    | `date` | Date de récupération de l'article |
-| `headline`        | `str` | Titre de l'article |
-| `body`            | `str` | Contenu de l'article |
-| `organizations`   | `list[str]` | Liste des organisations mentionnées dans l'article |
-| `topics`          | `list[str]` | Liste des sujets détectés dans l'article |
-| `sentiment`       | `float` | Score de sentiment de l'article (-1 : négatif, 0 : neutre, 1 : positif) |
-| `scandal_distance`| `float` | Score indiquant la probabilité d'un scandale environnemental |
-| `top_10`          | `bool` | Indique si l'article fait partie des 10 plus susceptibles d'être liés à un scandale |
+| `uuid`            | `int` or `str` | Unique identifier of the article |
+| `url`             | `str` | URL of the article |
+| `date_scraped`    | `date` | Date when the article was retrieved |
+| `headline`        | `str` | Article title |
+| `body`            | `str` | Article content |
+| `organizations`   | `list[str]` | List of organizations mentioned in the article |
+| `topics`          | `list[str]` | List of topics detected in the article |
+| `sentiment`       | `float` | Sentiment score of the article (-1: negative, 0: neutral, 1: positive) |
+| `scandal_distance`| `float` | Score indicating the probability of an environmental scandal |
+| `top_10`          | `bool` | Indicates if the article is among the 10 most likely to be related to a scandal |
 
-## Exécution des script
+## Script Execution
 
-Pour exécuter l'extraction des articles :
+To run the article extraction:
 
 ```bash
 python scrapper.py
 ```
 
-Pour exécuter le traitement des articles :
+To run the article processing:
 
 ```bash
 python nlp_enriched_news.py
 ```
 
-L'exécution affichera des informations détaillées sur chaque étape du pipeline :
+The execution will display detailed information about each step of the pipeline:
 
 ```
 Enriching <URL>:
@@ -57,40 +57,39 @@ Computing embeddings and distance ...
 Environmental scandal detected for <entity>
 ```
 
-## Explication des choix méthodologiques
+## Explanation of Methodological Choices
 
-### Modèle d'Embeddings
-Nous utilisons le modèle **`fr_core_news_md`** de SpaCy, un modèle de taille intermédiaire contenant des représentations vectorielles pour les mots en français. Ce modèle a été choisi car :
-- Il offre un bon équilibre entre précision et performance.
-- Il fournit des embeddings de mots pré-entraînés utiles pour la détection de similarité sémantique.
-- Il intègre une reconnaissance des entités nommées efficace pour extraire les organisations citées.
+### Embeddings Model
+We use the **`fr_core_news_md`** model from SpaCy, a medium-sized model containing vector representations for French words. This model was chosen because:
+- It offers a good balance between accuracy and performance.
+- It provides pre-trained word embeddings useful for semantic similarity detection.
+- It integrates efficient named entity recognition to extract cited organizations.
 
-### Distance de Similarité
-Nous avons opté pour **la similarité cosinus** pour comparer les phrases avec les mots-clés liés aux scandales environnementaux. Ce choix repose sur les raisons suivantes :
-- La similarité cosinus est particulièrement efficace pour mesurer la proximité sémantique entre des vecteurs de mots ou de phrases.
-- Elle est indépendante de la longueur des phrases et est couramment utilisée en NLP.
-- Elle permet d'évaluer à quel point une phrase d'un article est proche des concepts de scandale environnemental.
+### Similarity Distance
+We opted for **cosine similarity** to compare sentences with keywords related to environmental scandals. This choice is based on the following reasons:
+- Cosine similarity is particularly effective for measuring semantic proximity between word or sentence vectors.
+- It is independent of sentence length and is commonly used in NLP.
+- It allows evaluation of how close a sentence in an article is to environmental scandal concepts.
 
-### Détection de Scandale
-Pour identifier les articles liés à des scandales environnementaux, nous :
-1. Extrayons les organisations mentionnées.
-2. Sélectionnons les phrases contenant ces organisations.
-3. Comparons leurs embeddings avec ceux des mots-clés liés aux scandales environnementaux.
-4. Calculons un score basé sur la similarité cosinus.
-5. Classons les articles et sélectionnons les 10 les plus pertinents.
+### Scandal Detection
+To identify articles related to environmental scandals, we:
+1. Extract mentioned organizations.
+2. Select sentences containing these organizations.
+3. Compare their embeddings with those of keywords related to environmental scandals.
+4. Calculate a score based on cosine similarity.
+5. Rank the articles and select the 10 most relevant ones.
 
-### Analyse de Sentiment
-Nous utilisons **VADER (SentimentIntensityAnalyzer de NLTK)** pour classifier les articles en `positif`, `neutre` ou `négatif`. Ce choix est motivé par :
-- Son efficacité pour analyser le ton des textes courts et informatifs.
-- Sa capacité à gérer les nuances grâce à un score `compound` permettant une classification fine.
+### Sentiment Analysis
+We use **VADER (SentimentIntensityAnalyzer from NLTK)** to classify articles as `positive`, `neutral`, or `negative`. This choice is motivated by:
+- Its effectiveness in analyzing the tone of short and informative texts.
+- Its ability to handle nuances thanks to a `compound` score allowing for fine classification.
 
-### Détection de Topics
-Le modèle de détection de sujets est chargé depuis `data/model/topic_classifier.pkl`. Il contient un vectorizer et un classifier entraîné sur des articles en français. Les sujets détectés sont ensuite ajoutés aux métadonnées de chaque article.
+### Topic Detection
+The topic detection model is loaded from `data/model/topic_classifier.pkl`. It contains a vectorizer and a classifier trained on French articles. The detected topics are then added to the metadata of each article.
 
-## Résultat final
-Le script génère un fichier `enhanced_news.csv` contenant toutes les informations enrichies pour chaque article.
+## Final Result
+The script generates an `enhanced_news.csv` file containing all enriched information for each article.
 
 ---
 
-Si vous avez des questions ou des suggestions, n'hésitez pas à contribuer ! 🚀
-
+If you have any questions or suggestions, feel free to contribute! 🚀
